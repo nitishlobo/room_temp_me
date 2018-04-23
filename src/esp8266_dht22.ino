@@ -1,9 +1,9 @@
 /* Sketch to read a DHT22 sensor via a wemos D1 mini (esp8266 chip).
 Connections (note: the numbers are DHT pins left to right in front face view):
-  1. DHT VDD (datasheet: min 3V, typical 5V) -> Wemos 3.3V
-  2. DHT DATA -> Wemos D0, also has a 10K res connected to DHT VDD
+  1. DHT VDD (datasheet: min 3V, typical 5V) --> Wemos 3.3V
+  2. DHT DATA                                --> Wemos D0, also has a 10K res connected to DHT VDD
   3. NULL
-  4. DHT GND -> Wemos GND
+  4. DHT GND                                 --> Wemos GND
 
 Author: Nitish Lobo
 Date: 19/06/17
