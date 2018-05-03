@@ -1,5 +1,11 @@
 ------------------------------------------------------------------
-PHYSICAL DEVICE SETUP:
+DEVICES NEEDED:
+1. DHT22 sensor (<$4)
+2. Wemos D1 mini (<$10)
+3. KanKun smart wifi plug socket ($20)
+
+------------------------------------------------------------------
+HARDWARE SETUP:
 1. See DHT22 manuals (in the datasheets directory of this repo) to learn the
     pin numbering convention.
     DHT_1 (VDD)   --> Wemos 3.3V
@@ -9,7 +15,7 @@ PHYSICAL DEVICE SETUP:
     Laptop port   --> Wemos micro usb
 
 ------------------------------------------------------------------
-SOFTWARE SETUP:
+SOFTWARE SETUP FOR KANKUN SMART PLUG:
 1. Install atom and then platformio.
 2. If the platform is Manjaro (not windows):
 
