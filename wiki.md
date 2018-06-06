@@ -183,3 +183,93 @@ https://webworxshop.com/2017/05/08/my-home-automation-setup
 OTHER SOURCES:
 https://github.com/homedash/kankun-json
 http://benlo.com/esp8266/KankunSmartPlug.html
+
+------------------------------------------------------------------
+SOFTWARE SETUP FOR HOME ASSISTANT (HASS):
+1. Install dependencies if they are not already installed.
+      sudo pacman install python3 python3-venv python3-pip
+
+2. Add an account for Home Assistant called homeassistant.
+   Since this account is only for running Home Assistant the extra argument
+   of -rm is added to create a system account and create a home directory.
+   The arguments -G uucp adds the user to the dialout group
+   (so that useraccount has control of RS-232 serial ports and devices connected to them).
+   uucp/dialout group is required for using Z-Wave and Zigbee controllers.
+      sudo useradd -rm homeassistant -G uucp
+
+3. Create a directory for the installation of Home Assistant and
+   change the owner to the homeassistant account.
+      cd /srv
+      sudo mkdir homeassistant
+      sudo chown homeassistant:homeassistant homeassistant
+
+4. Create and change to a virtual environment for Home Assistant.
+   This will be done as the homeassistant account.
+      sudo -u homeassistant -H -s
+      cd /srv/homeassistant
+      python3 -m venv .
+      source bin/activate
+
+5. Once you have activated the virtual environment (notice the prompt change),
+   install a required python package.
+      python3 -m pip install wheel
+
+6. Start Home Assistant for the first time.
+   This will complete the installation, create the .homeassistant configuration
+   directory in the /home/homeassistant directory and install any basic dependencies.
+   Do this by typing:
+      hass
+
+7. You can now reach your installation on your Raspberry Pi/PC over
+   the web interface on http://ipaddress:8123.
+   (Change the ipaddress part to be whatever your ip address is).
+
+SOURCE:
+https://www.home-assistant.io/docs/installation/raspberry-pi/
+
+------------------------------------------------------------------
+SOFTWARE SETUP FOR GIT-SECRET:
+1. Check whether you have GPG installed already (ie. type gpg --version).
+
+   Otherwise download the GPG command line tool from https://www.gnupg.org/download/
+   Unpack and install it, ie.
+      tar -xf [downloaded file name]
+
+   Navigate to the unpacked directory and then do:
+      ./configure
+      make
+      make check
+      make install
+
+2. Generate a GPG key pair:
+      gpg --full-generate-key
+
+  When prompted choose:
+   the default key (RSA and RSA),
+   max. key size (4096)
+   and no expiry (0)
+
+  To list GPG keys for which you have both a public and private key type:
+  (A private key is required for signing commits or tags.)
+      gpg --list-secret-keys --keyid-format LONG
+
+3. Copy the GPG key ID that starts with sec. In the following example, that's 30F2B65B9246B6CA.
+
+      sec   rsa4096/30F2B65B9246B6CA 2017-08-18 [SC]
+            D5E4F29F3275DC0CDA8FFC8730F2B65B9246B6CA
+      uid                   [ultimate] Mr. Robot <mr@robot.sh>
+      ssb   rsa4096/B7ABC0813E4028C0 2017-08-18 [E]
+
+4. Export the public key of that ID (replace your key ID from the previous step)
+   This will print the GPG key ID, in ASCII armor format.
+
+      gpg --armor --export [your own GPG key ID goes here, eg. 30F2B65B9246B6CA]
+
+5. Add the generated GPG key to your Gitlab account:
+   https://gitlab.com/profile/gpg_keys
+
+6. Now tell git which key to use.
+      git config --global user.signingkey [your own GPG key ID goes here, eg. 30F2B65B9246B6CA]
+
+SOURCE:
+https://docs.gitlab.com/ee/user/project/repository/gpg_signed_commits/index.html
