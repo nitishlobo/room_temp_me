@@ -214,10 +214,13 @@ SOFTWARE SETUP FOR HOME ASSISTANT (HASS):
    install a required python package.
       python3 -m pip install wheel
 
-6. Start Home Assistant for the first time.
-   This will complete the installation, create the .homeassistant configuration
+6. Now install homeassistant via pip
+      pip3 install homeassistant
+
+7. Start Home Assistant for the first time.
+   Doing the below will complete the installation, create the .homeassistant configuration
    directory in the /home/homeassistant directory and install any basic dependencies.
-   Do this by typing:
+      cd /srv/homeassistant
       hass
 
 7. You can now reach your installation on your Raspberry Pi/PC over
@@ -227,8 +230,45 @@ SOFTWARE SETUP FOR HOME ASSISTANT (HASS):
 SOURCE:
 https://www.home-assistant.io/docs/installation/raspberry-pi/
 
+8. Next you can setup HASS so that it auto-starts on laptop boot up.
+   Most linux distro's use systemd to manage daemons.
+   To check this is the case, with your distro, do:
+      ps -p 1 -o comm=
+   If the return value is systemd. Then continue.
+
+9. Navigate command line to the config folder of this repo. Then execute:
+      scp home-assistant\@homeassistant.service /etc/systemd/system/
+   Note that you may need to sudo to do this command.
+   Note also that you need to do \@ and not just @.
+
+10. Reload systemd to make the daemon aware of the new configuration
+      sudo systemctl --system daemon-reload
+
+11. Have Home Assistant start automatically at boot, enable the service.
+      sudo systemctl enable home-assistant@homeassistant
+
+12. To start Home Assistant now, use this command:
+      sudo systemctl start home-assistant@homeassistant
+
+    Note: You can also substitute the 'start' above with 'stop' to stop Home Assistant,
+    'restart' to restart Home Assistant, and ‘status’ to see a brief status report.
+
+ADDITIONAL INFO:
+- To disable the automatic start, use this command:
+      sudo systemctl disable home-assistant@homeassistant
+- To get Home Assistant’s logging output, simple use journalctl:
+      sudo journalctl -f -u home-assistant@homeassistant
+- Because the log can scroll quite quickly, you can select to view only the error lines:
+      sudo journalctl -f -u home-assistant@homeassistant | grep -i 'error'
+- When working on Home Assistant, you can easily restart the system and
+  then watch the log output by combining the above commands using &&
+      sudo systemctl restart home-assistant@homeassistant && sudo journalctl -f -u home-assistant@homeassistant
+
+SOURCE:
+https://www.home-assistant.io/docs/autostart/systemd/
+
 ------------------------------------------------------------------
-SOFTWARE SETUP FOR GIT-SECRET:
+PRE-SOFTWARE SETUP FOR GIT-CRYPT:
 1. Check whether you have GPG installed already (ie. type gpg --version).
 
    Otherwise download the GPG command line tool from https://www.gnupg.org/download/
@@ -273,3 +313,55 @@ SOFTWARE SETUP FOR GIT-SECRET:
 
 SOURCE:
 https://docs.gitlab.com/ee/user/project/repository/gpg_signed_commits/index.html
+
+------------------------------------------------------------------
+SOFTWARE SETUP FOR GIT-CRYPT:
+1. Download git crypt from:
+   https://www.agwa.name/projects/git-crypt/downloads/git-crypt-0.6.0.tar.gz
+
+2. Extract the file and install it with the following:
+      cd git-crypt-0.6.0 (ie. cd the terminal to whatever name you downloaded git-crypt as).
+      make
+      make install
+
+3. List your gpg key (that you added earlier) by doing:
+      gpg -k
+
+   Copy the pub USER_ID key. Eg. D5E4F29F3275DC0CDA8FFC8730F2B65B9246B6CA
+
+4. Add gpg user key so that you can share the repo with yourself or others:
+      git-crypt add-gpg-user [USER_ID]
+   Replace the '[USER_ID]' part with the key you copied in step 3.
+
+5. Navigate to the repo you are interested in and then initiate git-crypt:
+      cd repo
+      git-crypt init
+
+6. Specify files to encrypt by creating a .gitattributes file in the repository, like this:
+      secretfile filter=git-crypt diff=git-crypt
+      *.key filter=git-crypt diff=git-crypt
+
+/*
+NOTE A:
+After cloning a repository with encrypted files, unlock with:
+      git-crypt unlock
+
+NOTE B:
+The .gitattributes file is documented in the gitattributes(5) man page.
+The file pattern format is the same as the one used by .gitignore,
+as documented in the gitignore(5) man page, with the exception that
+specifying merely a directory (e.g. `/dir/`) is NOT sufficient to
+encrypt all files beneath it.
+
+Also note that the pattern `dir/*` does not match files under
+sub-directories of dir/.  To encrypt an entire sub-tree dir/, place the
+following in dir/.gitattributes:
+
+      * filter=git-crypt diff=git-crypt
+      .gitattributes !filter !diff
+
+The second pattern is essential for ensuring that .gitattributes itself
+is not encrypted.
+
+SOURCE:
+https://www.agwa.name/projects/git-crypt/

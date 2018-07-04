@@ -1,0 +1,14 @@
+#This file is to allow homeassistant to be launched as a startup service when
+#the laptop boots up.
+#Path to be saved as: /etc/systemd/system/home-assistant@homeassistant.service
+[Unit]
+Description=Home Assistant
+After=network-online.target
+
+[Service]
+Type=simple
+User=%i
+ExecStart=/srv/homeassistant/bin/hass -c "/home/homeassistant/.homeassistant"
+
+[Install]
+WantedBy=multi-user.target

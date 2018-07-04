@@ -6,23 +6,43 @@ Connections (note: the numbers are DHT pins left to right in front face view):
   4. DHT GND                                 --> Wemos GND
 
 Author: Nitish Lobo
-Date: 19/06/17
 */
 
-#include "Arduino.h"
-#include "DHT.h"
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
+#include <DHT.h>
+#include <Secrets.h>
 
+//Temperature sensor setup
 #define DHTTYPE DHT22
 #define DHTPIN D1
-
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
   Serial.begin(9600);
+  Serial.println();
+
+  //Connect the Wemos to the WiFi.
+  Serial.print("Connecting to WiFi SSID: ");
+  Serial.println(SSID);
+  WiFi.begin(SSID, PASS);
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\t\t SUCCESS!");
+  Serial.print("ESP8266 device IP address is ");
+  Serial.print(WiFi.localIP());
+
+  Serial.print("Initialising temperature sensor...");
   dht.begin();
 }
 
 void loop() {
+  //Print IP address to serial monitor.
+  Serial.print("ESP8266 device IP address is "); Serial.print(WiFi.localIP()); Serial.print("    ");
+
   //Wait a few seconds between measurements.
   delay(2000);
 
@@ -38,7 +58,7 @@ void loop() {
     return;
   }
 
-  //Print results to serial monitor.
+  //Print DHT22 results to serial monitor.
   Serial.print("Temperature: "); Serial.print(t); Serial.print("*C");
   Serial.print("    ");
   Serial.print("Humidity: "); Serial.print(h); Serial.print("%");
